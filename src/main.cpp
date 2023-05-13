@@ -9,7 +9,7 @@
 #include "LoggerFactory.hpp"
 #include "SettingsAccessor.hpp"
 #include "DashboardService.hpp"
-//#include "WebServer.hpp"
+#include "WebServer.hpp"
 
 uRTCLib rtc(0x68);
 RtcDateTimeProvider dateTimeProvider(rtc);
@@ -18,7 +18,7 @@ TelegramNotifier* notifier;
 LoggerFactory* logger;
 WiFiManager* wifiManager;
 DashboardService* dashboard;
-//WebServer* WebServer; 
+WebServer* webServer; 
 
 void setup() {
     Serial.begin(9600);
@@ -47,26 +47,25 @@ void setup() {
     // Web Server
     dashboard = new DashboardService(*logger);
     dashboard->bebin();
-    // webServer = new WebServer(*tcpCommandProcessor, *logger);
-    // webServer->bebin(settings.tcpServerPort);
+    webServer = new WebServer(*dashboard, *logger);
+    webServer->bebin(settings.tcpServerPort);
 }
 
 void loop() {
-    rtc.refresh();
-    
-    // Demo
-    delay(3000);
-    logger->logInfo("Temterature: " + String(dashboard->getTemperature()) + "C");
-    logger->logInfo("Humidity   : " + String(dashboard->getHumidity()) + "%");
-    if (dashboard->getLedBlueStatus() == HIGH) {
-        dashboard->offLedBlue();
-    } else {
-        dashboard->onLedBlue();
-    }
-    if (dashboard->getLedRedStatus() == HIGH) {
-        dashboard->offLedRed();
-    } else {
-        dashboard->onLedRed();
-    }
-    
+    rtc.refresh(); // I have en error here: [103667][E][Wire.cpp:513] requestFrom(): i2cRead returned Error 263
+
+    // // Demo
+    // delay(3000);
+    // logger->logInfo("Temterature: " + String(dashboard->getTemperature()) + "C");
+    // logger->logInfo("Humidity   : " + String(dashboard->getHumidity()) + "%");
+    // if (dashboard->getLedBlueStatus() == HIGH) {
+    //     dashboard->offLedBlue();
+    // } else {
+    //     dashboard->onLedBlue();
+    // }
+    // if (dashboard->getLedRedStatus() == HIGH) {
+    //     dashboard->offLedRed();
+    // } else {
+    //     dashboard->onLedRed();
+    // }
 }

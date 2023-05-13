@@ -23,7 +23,7 @@ public:
             return settings;
         }
 
-        File file = _sd.open(FIlE_NAME, FILE_READ);
+        auto file = _sd.open(FIlE_NAME, FILE_READ);
         if (!file) {
             file.close();
             Serial.print("Failed to open ");

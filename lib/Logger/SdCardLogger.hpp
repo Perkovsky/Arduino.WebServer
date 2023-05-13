@@ -14,7 +14,7 @@ public:
 
 protected:
     bool log(const String& message) override {
-        File file = _sd.open(FIlE_NAME, FILE_WRITE);
+        auto file = _sd.open(FIlE_NAME, FILE_WRITE);
         
         if (!file)
             return false;
