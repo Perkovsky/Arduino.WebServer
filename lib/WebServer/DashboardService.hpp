@@ -23,24 +23,16 @@ public:
        _dht->begin();
     }
 
-    void onLedBlue() {
-        digitalWrite(LED_BLUE_PIN, HIGH);
-    }
-
-    void offLedBlue() {
-        digitalWrite(LED_BLUE_PIN, LOW);
+    void toggleLedBlue(uint8_t value) {
+        digitalWrite(LED_BLUE_PIN, value);
     }
 
     int getLedBlueStatus() {
         return digitalRead(LED_BLUE_PIN);
     }
 
-    void onLedRed() {
-        digitalWrite(LED_RED_PIN, HIGH);
-    }
-
-    void offLedRed() {
-        digitalWrite(LED_RED_PIN, LOW);
+    void toggleLedRed(uint8_t value) {
+        digitalWrite(LED_RED_PIN, value);
     }
 
     int getLedRedStatus() {

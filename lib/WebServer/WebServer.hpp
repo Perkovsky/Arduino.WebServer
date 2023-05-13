@@ -2,7 +2,7 @@
 
 #include <String.h>
 #include <SdFat.h>
-#include <AsyncTCP.h>
+#include <ArduinoJson.h>
 #include "ESPAsyncWebServer.h"
 #include "LoggerFactory.hpp"
 #include "DashboardService.hpp"
@@ -45,12 +45,66 @@ private:
             request->send_P(200, "text/plain", buffer);
         });
 
-         //TODO: POST -> response code: 204
-         // toggleLedBlue
-         // toggleLedBRed
+        _server->on("/toggle-led-blue", HTTP_POST, 
+            [this](AsyncWebServerRequest *request) {/* do nothing */},
+            [this](AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final) {/* do nothing */},
+            [this](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+                DynamicJsonDocument doc(total);
+                DeserializationError error = deserializeJson(doc, data, len);
+                if (error) {
+                    request->send(400, "text/plain", "Invalid JSON.");
+                    return;
+                }
+                
+                if (doc["value"].isNull()) {
+                    request->send(400, "text/plain", "Value is required.");
+                    return;
+                }
 
-        _server->onNotFound([](AsyncWebServerRequest *request){
-            request->redirect("/");
+                if (!doc["value"].is<uint8_t>()) {
+                    request->send(400, "text/plain", "Value has incorrect type. Should be integer.");
+                    return;
+                }
+
+                auto value = doc["value"].as<uint8_t>();
+                _dashboard.toggleLedBlue(value);
+                request->send(204);
+            }
+        );
+
+        _server->on("/toggle-led-red", HTTP_POST, 
+            [this](AsyncWebServerRequest *request) {/* do nothing */},
+            [this](AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final) {/* do nothing */},
+            [this](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+                DynamicJsonDocument doc(total);
+                DeserializationError error = deserializeJson(doc, data, len);
+                if (error) {
+                    request->send(400, "text/plain", "Invalid JSON.");
+                    return;
+                }
+                
+                if (doc["value"].isNull()) {
+                    request->send(400, "text/plain", "Value is required.");
+                    return;
+                }
+
+                if (!doc["value"].is<uint8_t>()) {
+                    request->send(400, "text/plain", "Value has incorrect type. Should be integer.");
+                    return;
+                }
+
+                auto value = doc["value"].as<uint8_t>();
+                _dashboard.toggleLedRed(value);
+                request->send(204);
+            }
+        );
+
+        _server->onNotFound([](AsyncWebServerRequest *request) {
+            if  (request->method() == HTTP_GET) {
+                request->redirect("/");
+            } else {
+                request->send(404);
+            }
         });
     }
 

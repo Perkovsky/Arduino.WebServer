@@ -58,14 +58,6 @@ void loop() {
     // delay(3000);
     // logger->logInfo("Temterature: " + String(dashboard->getTemperature()) + "C");
     // logger->logInfo("Humidity   : " + String(dashboard->getHumidity()) + "%");
-    // if (dashboard->getLedBlueStatus() == HIGH) {
-    //     dashboard->offLedBlue();
-    // } else {
-    //     dashboard->onLedBlue();
-    // }
-    // if (dashboard->getLedRedStatus() == HIGH) {
-    //     dashboard->offLedRed();
-    // } else {
-    //     dashboard->onLedRed();
-    // }
+    // dashboard->toggleLedBlue(!dashboard->getLedBlueStatus());
+    // dashboard->toggleLedRed(!dashboard->getLedRedStatus());
 }
