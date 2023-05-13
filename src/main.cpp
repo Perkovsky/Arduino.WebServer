@@ -47,7 +47,7 @@ void setup() {
     // Web Server
     dashboard = new DashboardService(*logger);
     dashboard->bebin();
-    webServer = new WebServer(*dashboard, *logger);
+    webServer = new WebServer(*dashboard, *logger, sd);
     webServer->bebin(settings.tcpServerPort);
 }
 
