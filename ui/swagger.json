@@ -1,0 +1,166 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ESP32 Web Server API",
+    "description": "This is a sample ESP32 Web Server.",
+    "contact": {
+      "email": "igor.v.perkovsky@gmail.com"
+    },
+    "version": "1.0.0"
+  },
+  "tags": [
+    {
+      "name": "Dashboard"
+    }
+  ],
+  "paths": {
+    "/temperature": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "summary": "Get temperature",
+        "description": "Get temperature with the DHT11 or DHT22",
+        "operationId": "getTemperature",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/humidity": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "summary": "Get humidity",
+        "description": "Get humidity with the DHT11 or DHT22",
+        "operationId": "getHumidity",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/toggle-led-blue": {
+      "post": {
+        "tags": [
+          "Dashboard"
+        ],
+        "summary": "Toggle blue LED",
+        "description": "Toggle blue LED",
+        "operationId": "toggleLedBlue",
+        "requestBody": {
+          "description": "On/Off blue LED",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ToggleLedRequestModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Bad reqiest"
+          }
+        }
+      }
+    },
+    "/toggle-led-red": {
+      "post": {
+        "tags": [
+          "Dashboard"
+        ],
+        "summary": "Toggle red LED",
+        "description": "Toggle red LED",
+        "operationId": "toggleLedRed",
+        "requestBody": {
+          "description": "On/Off red LED",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ToggleLedRequestModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Bad reqiest"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ToggleLedRequestModel": {
+        "required": [
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          }
+        }
+      }
+    },
+    "requestBodies": {
+      "ToggleLedRequestModel": {
+        "description": "The parameter has two possible values: 0 or 1.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ToggleLedRequestModel"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "api_key": {
+        "type": "apiKey",
+        "name": "api_key",
+        "in": "header"
+      }
+    }
+  }
+}
