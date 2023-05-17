@@ -89,7 +89,7 @@
         this.$http.get('/led-blue-status')
           .then(response => {
             //console.log(response.data)
-            this.ledBlue = response.data
+            this.ledBlue = response.data == 0
           })
           .catch(error => {
             console.log(error)
@@ -99,7 +99,7 @@
         this.$http.get('/led-red-status')
           .then(response => {
             //console.log(response.data)
-            this.ledRed = response.data
+            this.ledRed = response.data == 0
           })
           .catch(error => {
             console.log(error)

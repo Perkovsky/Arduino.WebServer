@@ -13,15 +13,25 @@ private:
     const String SWAGGER_UI_FIlE_NAME = F("swaggerUI.html");
     const char* swaggerJSON;
     const char* swaggerUI;
+    //const char* dashboardUI;
 
     LoggerFactory& _logger;
+    //SdFat& _sd;
     DashboardService& _dashboard;
     AsyncWebServer* _server;
 
     void addRouteHandlers() {
         _server->on("/", HTTP_GET, [this](AsyncWebServerRequest *request) {
             request->send_P(200, "text/html", "The Dashboard has not yet been implemented.");
+            //request->send(SD, "index.html", "text/html");
+            // auto file = _sd.open("index.html", 0); // FILE_READ
+            // request->send(file, "text/html");
+            // file.close();
         });
+
+        // _server->on("/dashboard.html", HTTP_GET, [this](AsyncWebServerRequest *request) {
+        //     request->send_P(200, "text/html", dashboardUI);
+        // });
 
         _server->on("/swagger/index.html", HTTP_GET, [this](AsyncWebServerRequest *request) {
             request->send_P(200, "text/html", swaggerUI);
@@ -41,6 +51,20 @@ private:
         _server->on("/humidity", HTTP_GET, [this](AsyncWebServerRequest *request) {
             float result = _dashboard.getHumidity();
             char buffer[10];
+            dtostrf(result, 5, 2, buffer);
+            request->send_P(200, "text/plain", buffer);
+        });
+
+        _server->on("/led-blue-status", HTTP_GET, [this](AsyncWebServerRequest *request) {
+            int result = _dashboard.getLedBlueStatus();
+            char buffer[2];
+            dtostrf(result, 5, 2, buffer);
+            request->send_P(200, "text/plain", buffer);
+        });
+
+        _server->on("/led-red-status", HTTP_GET, [this](AsyncWebServerRequest *request) {
+            int result = _dashboard.getLedRedStatus();
+            char buffer[2];
             dtostrf(result, 5, 2, buffer);
             request->send_P(200, "text/plain", buffer);
         });
@@ -109,7 +133,7 @@ private:
     }
 
     char* getFileContent(SdFat& sd, const String& filename) {
-         if (!sd.exists(filename)) {
+        if (!sd.exists(filename)) {
             String error(filename);
             error.reserve(filename.length() + 16);
             error += " does not exist";
@@ -138,15 +162,17 @@ private:
 
 public:
     WebServer(DashboardService& dashboard, LoggerFactory& logger, SdFat& sd)
-        : _dashboard(dashboard), _logger(logger)
+        : _dashboard(dashboard), _logger(logger)/*, _sd(sd)*/
     {
-       swaggerJSON = getFileContent(sd, SWAGGER_JSON_FIlE_NAME);
-       swaggerUI = getFileContent(sd, SWAGGER_UI_FIlE_NAME);
+        swaggerJSON = getFileContent(sd, SWAGGER_JSON_FIlE_NAME);
+        swaggerUI = getFileContent(sd, SWAGGER_UI_FIlE_NAME);
+        //dashboardUI = getFileContent(sd, "dashboard.html");
     }
 
     void bebin(uint16_t port) {
         _server = new AsyncWebServer(80);
         addRouteHandlers();
+        //_server->serveStatic("/", SD, "/");
         _server->begin();
         _logger.logInfo("Web Server has been started");
     }
