@@ -36,6 +36,8 @@ paths:
            text/plain:
               schema:
                 type: number
+        '403':
+          description: Access denied
       security:
         - api_key: []
   /humidity:
@@ -52,6 +54,8 @@ paths:
            text/plain:
               schema:
                 type: number
+        '403':
+          description: Access denied
       security:
         - api_key: []
   /led-blue-status:
@@ -68,6 +72,8 @@ paths:
            text/plain:
               schema:
                 type: boolean
+        '403':
+          description: Access denied
       security:
         - api_key: []
   /led-red-status:
@@ -84,6 +90,8 @@ paths:
            text/plain:
               schema:
                 type: boolean
+        '403':
+          description: Access denied
       security:
         - api_key: []
   /toggle-led-blue:
@@ -105,6 +113,10 @@ paths:
           description: Successful operation
         '400':
           description: Bad reqiest
+        '403':
+          description: Access denied
+      security:
+        - api_key: []
   /toggle-led-red:
     post:
       tags:
@@ -124,6 +136,10 @@ paths:
           description: Successful operation
         '400':
           description: Bad reqiest
+        '403':
+          description: Access denied
+      security:
+        - api_key: []
 components:
   schemas:
     ToggleLedRequestModel:

@@ -105,20 +105,12 @@
       },
       toggleLedBlue() {
         this.$http.post('/toggle-led-blue', { value: Number(!!this.ledBlue) })
-          // .then(response => {
-          //   console.log(response.data)
-          //   // do nothing
-          // })
           .catch(error => {
             console.log(error)
           })
       },
       toggleLedRed() {
         this.$http.post('/toggle-led-red', { value: Number(!!this.ledRed) })
-          // .then(() => {
-          //   //this.getTemperature()
-          //   // do nothing
-          // })
           .catch(error => {
             console.log(error)
           })

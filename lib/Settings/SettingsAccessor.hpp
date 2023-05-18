@@ -57,6 +57,7 @@ public:
         settings.telegram.botId = doc["telegram"]["botId"].as<String>();
         settings.telegram.chatId = doc["telegram"]["chatId"].as<String>();
         settings.tcpServerPort = doc["tcpServerPort"].as<uint16_t>();
+        settings.apiKey = doc["apiKey"].as<String>();
 
         file.close();
         doc.clear();

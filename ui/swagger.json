@@ -32,6 +32,9 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Access denied"
           }
         },
         "security": [
@@ -59,6 +62,9 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Access denied"
           }
         },
         "security": [
@@ -86,6 +92,9 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Access denied"
           }
         },
         "security": [
@@ -113,6 +122,9 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Access denied"
           }
         },
         "security": [
@@ -147,8 +159,16 @@
           },
           "400": {
             "description": "Bad reqiest"
+          },
+          "403": {
+            "description": "Access denied"
           }
-        }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
       }
     },
     "/toggle-led-red": {
@@ -176,8 +196,16 @@
           },
           "400": {
             "description": "Bad reqiest"
+          },
+          "403": {
+            "description": "Access denied"
           }
-        }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
       }
     }
   },

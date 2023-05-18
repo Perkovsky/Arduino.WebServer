@@ -11,6 +11,8 @@ class WebServer {
 private:
     const String SWAGGER_JSON_FIlE_NAME = F("swagger.json");
     const String SWAGGER_UI_FIlE_NAME = F("swaggerUI.html");
+    const String API_KEY_NAME = F("api_key");
+    const String _apiKey;
     const char* swaggerJSON;
     const char* swaggerUI;
 
@@ -18,47 +20,81 @@ private:
     DashboardService& _dashboard;
     AsyncWebServer* _server;
 
+    bool isApiKeyInvalid(AsyncWebServerRequest* request) {
+        if (!request->hasHeader(API_KEY_NAME)) {
+            return true;
+        }
+        
+        const String value = request->getHeader(API_KEY_NAME)->value();
+        return value != _apiKey;
+    }
+
     void addRouteHandlers() {
-        _server->on("/", HTTP_GET, [this](AsyncWebServerRequest *request) {
+        _server->on("/", HTTP_GET, [this](AsyncWebServerRequest* request) {
             request->send_P(200, "text/html", "Welcome to ESP32 Web Server");
         });
 
-        _server->on("/swagger/index.html", HTTP_GET, [this](AsyncWebServerRequest *request) {
+        _server->on("/swagger/index.html", HTTP_GET, [this](AsyncWebServerRequest* request) {
             request->send_P(200, "text/html", swaggerUI);
         });
 
-         _server->on("/swagger.json", HTTP_GET, [this](AsyncWebServerRequest *request) {
+         _server->on("/swagger.json", HTTP_GET, [this](AsyncWebServerRequest* request) {
             request->send_P(200, "application/json", swaggerJSON);
         });
 
-        _server->on("/temperature", HTTP_GET, [this](AsyncWebServerRequest *request) {
+        _server->on("/temperature", HTTP_GET, [this](AsyncWebServerRequest* request) {
+            if (isApiKeyInvalid(request)) {
+                request->send(403);
+                return;
+            }
+
             float result = _dashboard.getTemperature();
             char buffer[10];
             dtostrf(result, 5, 2, buffer);
             request->send_P(200, "text/plain", buffer);
         });
 
-        _server->on("/humidity", HTTP_GET, [this](AsyncWebServerRequest *request) {
+        _server->on("/humidity", HTTP_GET, [this](AsyncWebServerRequest* request) {
+            if (isApiKeyInvalid(request)) {
+                request->send(403);
+                return;
+            }
+
             float result = _dashboard.getHumidity();
             char buffer[10];
             dtostrf(result, 5, 2, buffer);
             request->send_P(200, "text/plain", buffer);
         });
 
-        _server->on("/led-blue-status", HTTP_GET, [this](AsyncWebServerRequest *request) {
+        _server->on("/led-blue-status", HTTP_GET, [this](AsyncWebServerRequest* request) {
+            if (isApiKeyInvalid(request)) {
+                request->send(403);
+                return;
+            }
+
             int result = _dashboard.getLedBlueStatus();
             request->send_P(200, "text/plain", result == 0 ? "false" : "true");
         });
 
-        _server->on("/led-red-status", HTTP_GET, [this](AsyncWebServerRequest *request) {
+        _server->on("/led-red-status", HTTP_GET, [this](AsyncWebServerRequest* request) {
+            if (isApiKeyInvalid(request)) {
+                request->send(403);
+                return;
+            }
+
             int result = _dashboard.getLedRedStatus();
             request->send_P(200, "text/plain", result == 0 ? "false" : "true");
         });
 
         _server->on("/toggle-led-blue", HTTP_POST, 
-            [this](AsyncWebServerRequest *request) {/* do nothing */},
-            [this](AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final) {/* do nothing */},
-            [this](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+            [this](AsyncWebServerRequest* request) {/* do nothing */},
+            [this](AsyncWebServerRequest* request, const String& filename, size_t index, uint8_t* data, size_t len, bool final) {/* do nothing */},
+            [this](AsyncWebServerRequest* request, uint8_t* data, size_t len, size_t index, size_t total) {
+                if (isApiKeyInvalid(request)) {
+                    request->send(403);
+                    return;
+                }
+
                 StaticJsonDocument<32> doc;
                 DeserializationError error = deserializeJson(doc, data);
                 if (error) {
@@ -84,9 +120,14 @@ private:
         );
 
         _server->on("/toggle-led-red", HTTP_POST, 
-            [this](AsyncWebServerRequest *request) {/* do nothing */},
-            [this](AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final) {/* do nothing */},
-            [this](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+            [this](AsyncWebServerRequest* request) {/* do nothing */},
+            [this](AsyncWebServerRequest* request, const String& filename, size_t index, uint8_t* data, size_t len, bool final) {/* do nothing */},
+            [this](AsyncWebServerRequest* request, uint8_t* data, size_t len, size_t index, size_t total) {
+                if (isApiKeyInvalid(request)) {
+                    request->send(403);
+                    return;
+                }
+
                 StaticJsonDocument<32> doc;
                 DeserializationError error = deserializeJson(doc, data);
                 if (error) {
@@ -111,7 +152,7 @@ private:
             }
         );
 
-        _server->onNotFound([](AsyncWebServerRequest *request) {
+        _server->onNotFound([](AsyncWebServerRequest* request) {
             if (request->method() == HTTP_OPTIONS) {
                 request->send(200);
             } else if (request->method() == HTTP_GET) {
@@ -151,8 +192,8 @@ private:
     }
 
 public:
-    WebServer(DashboardService& dashboard, LoggerFactory& logger, SdFat& sd)
-        : _dashboard(dashboard), _logger(logger)
+    WebServer(DashboardService& dashboard, LoggerFactory& logger, SdFat& sd, const String& apiKey)
+        : _dashboard(dashboard), _logger(logger), _apiKey(apiKey)
     {
         swaggerJSON = getFileContent(sd, SWAGGER_JSON_FIlE_NAME);
         swaggerUI = getFileContent(sd, SWAGGER_UI_FIlE_NAME);

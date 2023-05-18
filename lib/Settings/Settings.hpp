@@ -27,4 +27,5 @@ struct Settings {
     EthernetSettings ethernet;
     TelegramSettings telegram;
     uint16_t tcpServerPort;
+    String apiKey;
 };

@@ -47,7 +47,7 @@ void setup() {
     // Web Server
     dashboard = new DashboardService(*logger);
     dashboard->bebin();
-    webServer = new WebServer(*dashboard, *logger, sd);
+    webServer = new WebServer(*dashboard, *logger, sd, settings.apiKey);
     webServer->bebin(80);
 }
 
