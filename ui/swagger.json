@@ -28,7 +28,7 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "string"
+                  "type": "number"
                 }
               }
             }
@@ -55,7 +55,61 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "string"
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/led-blue-status": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "summary": "Get blue LED status",
+        "description": "Get blue LED status: on/off (true/false)",
+        "operationId": "getLedBlueStatus",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/led-red-status": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "summary": "Get red LED status",
+        "description": "Get red LED status: on/off (true/false)",
+        "operationId": "getLedRedStatus",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "boolean"
                 }
               }
             }

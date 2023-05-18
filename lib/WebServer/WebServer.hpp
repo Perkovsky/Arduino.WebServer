@@ -13,25 +13,15 @@ private:
     const String SWAGGER_UI_FIlE_NAME = F("swaggerUI.html");
     const char* swaggerJSON;
     const char* swaggerUI;
-    //const char* dashboardUI;
 
     LoggerFactory& _logger;
-    //SdFat& _sd;
     DashboardService& _dashboard;
     AsyncWebServer* _server;
 
     void addRouteHandlers() {
         _server->on("/", HTTP_GET, [this](AsyncWebServerRequest *request) {
-            request->send_P(200, "text/html", "The Dashboard has not yet been implemented.");
-            //request->send(SD, "index.html", "text/html");
-            // auto file = _sd.open("index.html", 0); // FILE_READ
-            // request->send(file, "text/html");
-            // file.close();
+            request->send_P(200, "text/html", "Welcome to ESP32 Web Server");
         });
-
-        // _server->on("/dashboard.html", HTTP_GET, [this](AsyncWebServerRequest *request) {
-        //     request->send_P(200, "text/html", dashboardUI);
-        // });
 
         _server->on("/swagger/index.html", HTTP_GET, [this](AsyncWebServerRequest *request) {
             request->send_P(200, "text/html", swaggerUI);
@@ -57,25 +47,22 @@ private:
 
         _server->on("/led-blue-status", HTTP_GET, [this](AsyncWebServerRequest *request) {
             int result = _dashboard.getLedBlueStatus();
-            char buffer[2];
-            dtostrf(result, 5, 2, buffer);
-            request->send_P(200, "text/plain", buffer);
+            request->send_P(200, "text/plain", result == 0 ? "false" : "true");
         });
 
         _server->on("/led-red-status", HTTP_GET, [this](AsyncWebServerRequest *request) {
             int result = _dashboard.getLedRedStatus();
-            char buffer[2];
-            dtostrf(result, 5, 2, buffer);
-            request->send_P(200, "text/plain", buffer);
+            request->send_P(200, "text/plain", result == 0 ? "false" : "true");
         });
 
         _server->on("/toggle-led-blue", HTTP_POST, 
             [this](AsyncWebServerRequest *request) {/* do nothing */},
             [this](AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final) {/* do nothing */},
             [this](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
-                DynamicJsonDocument doc(total);
-                DeserializationError error = deserializeJson(doc, data, len);
+                StaticJsonDocument<32> doc;
+                DeserializationError error = deserializeJson(doc, data);
                 if (error) {
+                    _logger.logWarning(error.c_str());
                     request->send(400, "text/plain", "Invalid JSON.");
                     return;
                 }
@@ -100,9 +87,10 @@ private:
             [this](AsyncWebServerRequest *request) {/* do nothing */},
             [this](AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final) {/* do nothing */},
             [this](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
-                DynamicJsonDocument doc(total);
-                DeserializationError error = deserializeJson(doc, data, len);
+                StaticJsonDocument<32> doc;
+                DeserializationError error = deserializeJson(doc, data);
                 if (error) {
+                    _logger.logWarning(error.c_str());
                     request->send(400, "text/plain", "Invalid JSON.");
                     return;
                 }
@@ -124,7 +112,9 @@ private:
         );
 
         _server->onNotFound([](AsyncWebServerRequest *request) {
-            if  (request->method() == HTTP_GET) {
+            if (request->method() == HTTP_OPTIONS) {
+                request->send(200);
+            } else if (request->method() == HTTP_GET) {
                 request->redirect("/");
             } else {
                 request->send(404);
@@ -162,17 +152,20 @@ private:
 
 public:
     WebServer(DashboardService& dashboard, LoggerFactory& logger, SdFat& sd)
-        : _dashboard(dashboard), _logger(logger)/*, _sd(sd)*/
+        : _dashboard(dashboard), _logger(logger)
     {
         swaggerJSON = getFileContent(sd, SWAGGER_JSON_FIlE_NAME);
         swaggerUI = getFileContent(sd, SWAGGER_UI_FIlE_NAME);
-        //dashboardUI = getFileContent(sd, "dashboard.html");
     }
 
-    void bebin(uint16_t port) {
-        _server = new AsyncWebServer(80);
+    void bebin(uint16_t port = 80) {
+        _server = new AsyncWebServer(port);
+        
+        // enable CORS headers
+        DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
+        DefaultHeaders::Instance().addHeader("Access-Control-Allow-Headers", "*");
+
         addRouteHandlers();
-        //_server->serveStatic("/", SD, "/");
         _server->begin();
         _logger.logInfo("Web Server has been started");
     }

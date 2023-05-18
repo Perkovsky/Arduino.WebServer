@@ -1,7 +1,7 @@
 <template>
   <v-container class="fill-height">
     <v-responsive class="d-flex align-top text-center fill-height">
-      <!-- <v-img height="300" src="@/assets/logo.svg" /> -->
+      <v-img height="100" src="@/assets/logo.svg" />
       <h class="text-h4 font-weight-bold">Welcome to ESP32 Dashboard</h>
       <div class="py-14" />
 
@@ -88,8 +88,7 @@
       getLedBlueStatus() {
         this.$http.get('/led-blue-status')
           .then(response => {
-            //console.log(response.data)
-            this.ledBlue = response.data == 0
+            this.ledBlue = response.data
           })
           .catch(error => {
             console.log(error)
@@ -98,8 +97,7 @@
       getLedRedStatus() {
         this.$http.get('/led-red-status')
           .then(response => {
-            //console.log(response.data)
-            this.ledRed = response.data == 0
+            this.ledRed = response.data
           })
           .catch(error => {
             console.log(error)
@@ -107,18 +105,20 @@
       },
       toggleLedBlue() {
         this.$http.post('/toggle-led-blue', { value: Number(!!this.ledBlue) })
-          .then(response => {
-            this.getHumidity()
-          })
+          // .then(response => {
+          //   console.log(response.data)
+          //   // do nothing
+          // })
           .catch(error => {
             console.log(error)
           })
       },
       toggleLedRed() {
         this.$http.post('/toggle-led-red', { value: Number(!!this.ledRed) })
-          .then(response => {
-            this.getTemperature()
-          })
+          // .then(() => {
+          //   //this.getTemperature()
+          //   // do nothing
+          // })
           .catch(error => {
             console.log(error)
           })
