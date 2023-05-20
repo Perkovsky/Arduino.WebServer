@@ -19,6 +19,7 @@ private:
     LoggerFactory& _logger;
     DashboardService& _dashboard;
     AsyncWebServer* _server;
+    AsyncWebSocket* _ws;
 
     bool isApiKeyInvalid(AsyncWebServerRequest* request) {
         if (!request->hasHeader(API_KEY_NAME)) {
@@ -191,6 +192,61 @@ private:
         return content;
     }
 
+    String getWebSokectPayload() {
+        String payload("{\"temperature\":");
+        payload += String(_dashboard.getTemperature());
+        payload += ",\"humidity\":";
+        payload += String(_dashboard.getHumidity());
+        payload += ",\"ledBlueStatus\":";
+        payload += _dashboard.getLedBlueStatus() == 0 ? "false" : "true";
+        payload += ",\"ledRedStatus\":";
+        payload += _dashboard.getLedRedStatus() == 0 ? "false" : "true";
+        payload += "}";
+        return payload;
+    }
+
+    void onEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len) {
+        if (type == WS_EVT_CONNECT) {
+            String connectInfo("WebSocket client ");
+            connectInfo += String(client->id());
+            connectInfo += " has been connected from ";
+            connectInfo += client->remoteIP().toString();
+            _logger.logDebug(connectInfo);
+            return;
+        }
+
+        if (type == WS_EVT_DISCONNECT) {
+            String disconnectInfo("WebSocket client ");
+            disconnectInfo += String(client->id());
+            disconnectInfo += " has been disconnected";
+            _logger.logDebug(disconnectInfo);
+            return;
+        }
+
+        if (type == WS_EVT_DATA) {
+            _logger.logDebug("WebSocket data event has been occured");
+            return;
+        }
+
+         if (type == WS_EVT_ERROR) {
+            String errorInfo("Error(");
+            errorInfo += *((uint16_t*)arg);
+            errorInfo += "): ";
+            errorInfo += (char*)data;
+            errorInfo += ". WebSocket client ";
+            errorInfo += String(client->id());
+            _logger.logError(errorInfo);
+            return;
+        }
+    }
+
+    void initWebSocket() {
+        _ws->onEvent([this](AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len) {
+            this->onEvent(server, client, type, arg, data, len);
+        });
+        _server->addHandler(_ws);
+    }
+
 public:
     WebServer(DashboardService& dashboard, LoggerFactory& logger, SdFat& sd, const String& apiKey)
         : _dashboard(dashboard), _logger(logger), _apiKey(apiKey)
@@ -201,6 +257,8 @@ public:
 
     void bebin(uint16_t port = 80) {
         _server = new AsyncWebServer(port);
+        _ws = new AsyncWebSocket("/ws");
+        initWebSocket();
         
         // enable CORS headers
         DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
@@ -209,6 +267,12 @@ public:
         addRouteHandlers();
         _server->begin();
         _logger.logInfo("Web Server has been started");
+    }
+
+    void refresh() {
+        _ws->cleanupClients();
+        _ws->textAll(getWebSokectPayload());
+        delay(2000);
     }
 
     void end() {

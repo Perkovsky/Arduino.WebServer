@@ -53,11 +53,5 @@ void setup() {
 
 void loop() {
     //rtc.refresh(); // I have en error here: [103667][E][Wire.cpp:513] requestFrom(): i2cRead returned Error 263
-
-    // // Demo
-    // delay(3000);
-    // logger->logInfo("Temterature: " + String(dashboard->getTemperature()) + "C");
-    // logger->logInfo("Humidity   : " + String(dashboard->getHumidity()) + "%");
-    // dashboard->toggleLedBlue(!dashboard->getLedBlueStatus());
-    // dashboard->toggleLedRed(!dashboard->getLedRedStatus());
+    webServer->refresh();
 }

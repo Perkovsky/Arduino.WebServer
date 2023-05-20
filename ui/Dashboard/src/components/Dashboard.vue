@@ -65,6 +65,14 @@
       this.getLedRedStatus()
       this.getTemperature()
       this.getHumidity()
+
+      this.$options.sockets.onmessage = (message) => {
+        const data = JSON.parse(message.data)
+        this.temperature = data.temperature
+        this.humidity = data.humidity
+        this.ledBlue = data.ledBlueStatus
+        this.ledRed = data.ledRedStatus
+      }
     },
     methods: {
       getTemperature() {
