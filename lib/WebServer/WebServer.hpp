@@ -21,6 +21,8 @@ private:
     AsyncWebServer* _server;
     AsyncWebSocket* _ws;
 
+    unsigned long lastRefreshDashboardTime;
+
     bool isApiKeyInvalid(AsyncWebServerRequest* request) {
         if (!request->hasHeader(API_KEY_NAME)) {
             return true;
@@ -270,9 +272,14 @@ public:
     }
 
     void refresh() {
+        unsigned long currentTime = millis();
+        if (currentTime - lastRefreshDashboardTime < 2000) {
+            return;
+        }
+
+        lastRefreshDashboardTime = currentTime;
         _ws->cleanupClients();
         _ws->textAll(getWebSokectPayload());
-        delay(2000);
     }
 
     void end() {
