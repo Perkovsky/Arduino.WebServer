@@ -52,6 +52,6 @@ void setup() {
 }
 
 void loop() {
-    //rtc.refresh(); // I have en error here: [103667][E][Wire.cpp:513] requestFrom(): i2cRead returned Error 263
+    rtc.refresh();
     webServer->refresh();
 }

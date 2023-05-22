@@ -9,7 +9,7 @@ class DashboardService {
 private:
     const u_int8_t LED_BLUE_PIN = 12;   // GPIO12
     const u_int8_t LED_RED_PIN = 14;    // GPIO14
-    const u_int8_t DHT_PIN = 21;        // GPIO21
+    const u_int8_t DHT_PIN = 15;        // GPI15
 
     DHT* _dht = new DHT(DHT_PIN, DHT11);
     LoggerFactory& _logger;
