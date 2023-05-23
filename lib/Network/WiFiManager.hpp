@@ -18,9 +18,10 @@ public:
         pinMode(LED_BUILTIN, OUTPUT);
         digitalWrite(LED_BUILTIN, LOW);
 
+        WiFi.mode(WIFI_STA);
         WiFi.begin(_ssid, _password);
 
-        while (WiFi.status() == WL_CONNECTED) {
+        while (WiFi.status() != WL_CONNECTED) {
             delay(100);
             digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
         }
