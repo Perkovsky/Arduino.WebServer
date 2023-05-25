@@ -2,7 +2,8 @@ import App from './App.vue'
 import { createApp } from 'vue'
 import { registerPlugins } from '@/plugins'
 import axios from 'axios'
-import VueNativeSock from "vue-native-websocket-vue3";
+import VueNativeSock from "vue-native-websocket-vue3"
+import { createPinia } from 'pinia'
 
 const app = createApp(App)
 
@@ -22,4 +23,7 @@ app.use(VueNativeSock, `ws://${import.meta.env.VITE_API_URL}/ws`,  {
 
 registerPlugins(app)
 
-app.mount('#app')
+// Pinia DevTools Bug: https://github.com/vuejs/devtools/issues/1839
+//
+//app.mount('#app')
+app.use(createPinia()).mount('#app');

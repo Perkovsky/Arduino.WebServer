@@ -1,11 +1,12 @@
 <template>
   <v-app>
     <v-main>
-      <Dashboard />
+      <router-view />
     </v-main>
+    <Error />
   </v-app>
 </template>
 
 <script setup>
-  import Dashboard from '@/components/Dashboard.vue'
+import Error from '@/components/Error.vue'
 </script>
