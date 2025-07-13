@@ -8,13 +8,19 @@ import { createPinia } from 'pinia'
 const app = createApp(App)
 
 // Set up axios
-axios.defaults.baseURL = `http://${import.meta.env.VITE_API_URL}`
+axios.defaults.baseURL = import.meta.env.VITE_API_SECURE
+    ? `https://${import.meta.env.VITE_API_URL}`
+    : `http://${import.meta.env.VITE_API_URL}`
 axios.defaults.headers.common['Accept'] = 'application/json'
 axios.defaults.headers.common['api_key'] =  import.meta.env.VITE_API_KEY
 app.config.globalProperties.$http = axios
 
 // Set up WebSocket
-app.use(VueNativeSock, `ws://${import.meta.env.VITE_API_URL}/ws`,  {
+const wsUrl = import.meta.env.VITE_API_SECURE
+    ? `wss://${import.meta.env.VITE_API_URL}/ws`
+    : `ws://${import.meta.env.VITE_API_URL}/ws`
+
+app.use(VueNativeSock, wsUrl,  {
     format: 'json',
     reconnection: true,
     reconnectionAttempts: 5,
